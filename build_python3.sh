@@ -52,7 +52,7 @@ sudo apt install -y build-essential gdb lcov pkg-config \
       libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev \
       libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev \
       lzma lzma-dev tk-dev uuid-dev zlib1g-dev
-# Install 3.11 extra dependencies
+# Install Python 3 extra dependencies
 sudo apt install -y quilt sharutils libdb-dev blt-dev libbluetooth-dev \
       time xvfb python3-sphinx texinfo
 sudo apt install -y devscripts git git-buildpackage
@@ -62,7 +62,6 @@ mkdir Python$version-Dist
 cd Python$version-Dist
 git clone https://github.com/JetsonHacksNano/python$version.git
 cd python$version
-echo $PWD
-exit
+
 git checkout ubuntu/bionic
 gbp buildpackage --git-ignore-branch
