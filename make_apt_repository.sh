@@ -1,7 +1,7 @@
 #!/bin/bash
-# Build Python3 for Ubuntu 18.04 - JetPack 4.X
+# Build a local apt repository for Python .debs
+# Add to the apt sources
 # Copyright (c) JetsonHacks 2023
-# Build Python 3.9, 3.10, or 3.11 for JetPack 4.x (Jetson Linux - Ubuntu 18.04 - bionic )
 
 # Default version
 version="3.11"
@@ -42,26 +42,34 @@ if [[ "$version" != "3.9" ]] && [[ "$version" != "3.10" ]] && [[ "$version" != "
     echo "The version number $version is not supported. Please provide a correct version (3.9, 3.10, or 3.11)."
     exit 1
 fi
-echo "Building Python version: $version"
 
+# Check to see if this version has been built
+dir_path="$HOME/Python-Builds/Python$version-Dist"
+
+if [ -d "$dir_path" ]
+then
+    deb_files=$(find "$dir_path" -name "*.deb" | wc -l)
+
+    if [ "$deb_files" != "0" ]
+    then
+        echo "Creating local apt repository from $dir_path .deb files."
+    else
+        echo "Python version $version has not been built yet."
+        exit 1
+    fi
+else
+    echo "Python version $version has not been created yet."
+    exit 1
+fi
+# Copy the .deb files over to /opt/debs/python<version>
+# For example, /opt/debs/python3.11
+destination="/opt/debs/python$version"
+sudo mkdir -p $destination
+cd $dir_path
+sudo cp *.deb "$destination"
+# Create the package file
+cd /opt/debs/python$version
+sudo sh -c 'dpkg-scanpackages ./ /dev/null | gzip -9c > Packages.gz'
+# Create a list file for apt
+echo 'deb [trusted=yes] file://'$PWD ' ./' | sudo tee /etc/apt/sources.list.d/python$version-local.list
 sudo apt update
-sudo apt-get build-dep python3
-sudo apt install -y pkg-config
-# Install main dependencies
-sudo apt install -y build-essential gdb lcov pkg-config \
-      libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev \
-      libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev \
-      lzma lzma-dev tk-dev uuid-dev zlib1g-dev
-# Install Python 3 extra dependencies
-sudo apt install -y quilt sharutils libdb-dev blt-dev libbluetooth-dev \
-      time xvfb python3-sphinx texinfo
-sudo apt install -y devscripts git git-buildpackage
-mkdir -p ~/Python-Builds
-cd ~/Python-Builds
-mkdir Python$version-Dist
-cd Python$version-Dist
-git clone https://github.com/JetsonHacksNano/python$version.git
-cd python$version
-
-git checkout ubuntu/bionic
-gbp buildpackage --git-ignore-branch

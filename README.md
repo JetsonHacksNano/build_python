@@ -16,7 +16,19 @@ $ bash ./build_python3.sh --version 3.10
 ```
 The default build is Python3.11, the last supported version from Deadsnakes.
 
+You can add the .deb files individually. There is a convenience script to build an apt repository on a local file:
+```
+$ bash ./make_apt_repository.sh
+```
+Like the build_python script, there is a <version> flag.This script will copy the .deb files from the version specified to /opt/apt/python<version>, e.g. /opt/apt/python3.11. Also, the script places a .list file in /etc/apt/sources.list.d
+After the script is complete, you can use apt as normal. For example:
+```
+$ sudo apt install python3.11-full
+```
+Will install the full Python 3.11 environment, with the exception of things full dev and debug files. For example, it does not install python3.11-dev
+
 ## Notes
 ### June 2023, Initial Release
 - Tested on Jetson Nano 4GB, Python 3.11
+- After building, make a backup of the .deb files at least. You will need to modify the apt_repository file to install the .deb files if you want to do a standalone install on another machine.
 
