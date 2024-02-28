@@ -51,7 +51,10 @@ sudo apt install -y pkg-config
 sudo apt install -y build-essential gdb lcov pkg-config \
       libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev \
       libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev \
-      lzma lzma-dev tk-dev uuid-dev zlib1g-dev
+      lzma lzma-dev tk-dev uuid-dev zlib1g-dev  
+      
+sudo apt install -y libncursesw5-dev libmpdec-dev
+
 # Install Python 3 extra dependencies
 sudo apt install -y quilt sharutils libdb-dev blt-dev libbluetooth-dev \
       time xvfb python3-sphinx texinfo
@@ -64,4 +67,4 @@ git clone https://github.com/JetsonHacksNano/python$version.git
 cd python$version
 
 git checkout ubuntu/bionic
-gbp buildpackage --git-ignore-branch
+gbp buildpackage --git-ignore-branch -uc -us
